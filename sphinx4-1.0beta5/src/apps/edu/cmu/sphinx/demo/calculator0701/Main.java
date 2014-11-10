@@ -44,7 +44,8 @@ public class Main {
             System.exit(1);
         }
 
-        System.out.println("Say: (Good morning | Hello) ( Bhiksha | Evandro | Paul | Philip | Rita | Will )");
+        System.out.println("Say an operation");
+        System.out.println(Solver.calculate("pi squared"));
 
         // loop the recognition until the programm exits.
         while (true) {

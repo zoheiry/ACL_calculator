@@ -4,6 +4,20 @@
  * JSGF Grammar for Hello World example
  */
 
-grammar hello;
+grammar calculator;
 
-public <greet> = (Good morning | Hello) ( Bhiksha | Evandro | Paul | Philip | Rita | Will );
+public <expression> = <plus> | <minus> | <power> | <log> | <multiply> | <divide> | <square> | <cube>;
+<square> = <term> squared;
+<cube> = <term> cubed;
+<log> = log <term> (base <term>);
+<plus> = <term> plus <term>;
+<minus> = <term> minus <term>;
+<multiply> = <term> multiply <term>;
+<divide> = <term> divide <term>;
+<power> = <term> power <term>;
+<term> = <number> | (<digit>|zero)+ | <constant>;
+<constant> = e | pi;
+<digit> = one | two | three | four | five | six | seven | eight | nine;
+<number> = ([[<digit> thousand] <digit> hundred and ] ((<decade> [digit])| <teen>)) | <digit>;
+<decade> = twenty | thirty | forty | fifty | sixty | seventy | eighty | ninety;
+<teen> = eleven | twelve | thirteen | fourteen | fifteen | sixteen | seventeen | eighteen | nineteen;
