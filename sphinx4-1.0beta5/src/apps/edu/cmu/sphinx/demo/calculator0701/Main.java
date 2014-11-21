@@ -45,7 +45,7 @@ public class Main {
         }
 
         System.out.println("Say an operation");
-        System.out.println(Solver.calculate("pi squared"));
+        //System.out.println(Solver.calculate("five plus one"));
 
         // loop the recognition until the programm exits.
         while (true) {
@@ -55,7 +55,8 @@ public class Main {
 
             if (result != null) {
                 String resultText = result.getBestFinalResultNoFiller();
-                System.out.println("You said: " + resultText + '\n');
+                System.out.println("You said: " + resultText + "\nOutput: " + Solver.solve(resultText));
+                
             } else {
                 System.out.println("I can't hear what you said.\n");
             }

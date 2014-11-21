@@ -12,17 +12,22 @@ public class Parser {
 	public static final int POWER = 6;
 	public static final int SQUARE = 7;
 	public static final int CUBE = 8;
+	public static final int SAVE = 9;
+	public static final int RESTORE = 10;
 
 	private int command;
+
 	public int getCommand() {
 		return command;
 	}
+
 	public double[] getParsedArgs() {
 		return parsedArgs;
 	}
+
 	private double[] parsedArgs;
 
-	public Parser(String statement) {
+	public Parser(String statement) throws Exception {
 		String[] args;
 		if (statement.contains("plus")) {
 			args = statement.split("plus");
@@ -38,6 +43,9 @@ public class Parser {
 			this.command = POWER;
 		} else if (statement.contains("log")) {
 			args = statement.split("log");
+			if (args[0].contains("base")) {
+				args = args[0].split("base");
+			}
 			this.command = LOG;
 		} else if (statement.contains("divide")) {
 			args = statement.split("divide");
@@ -48,21 +56,32 @@ public class Parser {
 		} else if (statement.contains("cubed")) {
 			args = statement.split("cubed");
 			this.command = CUBE;
+		} else if (statement.contains("save")) {
+			args = new String[0];
+			this.command = SAVE;
+		} else if (statement.contains("restore")) {
+			args = new String[0];
+			this.command = RESTORE;
 		} else {
 			throw new ArithmeticException("Statement: '" + statement
 					+ "' does not have a valid command");
 		}
 		this.parseArgs(args);
 	}
-	public void parseArgs(String [] args) {
+
+	public void parseArgs(String[] args) throws Exception {
 		parsedArgs = new double[args.length];
-		for (int i = 0; i<args.length; i++) {
-			if (args[i].contains("e")) parsedArgs[i] = 2.71828;
-			else if (args[i].contains("pi")) parsedArgs[i] = 3.1415;
-			else parsedArgs[i] = convertToInt(args[i]);
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].trim().equalsIgnoreCase("e"))
+				parsedArgs[i] = 2.71828;
+			else if (args[i].trim().equalsIgnoreCase("pi"))
+				parsedArgs[i] = 3.1415;
+			else
+				parsedArgs[i] = convertToInt(args[i].trim());
 		}
 	}
-	public static long convertToInt(String input) {
+
+	public static long convertToInt(String input) throws Exception {
 		String[] digits = { "zero", "one", "two", "three", "four", "five",
 				"six", "seven", "eight", "nine" };
 		String[] testArray = input.split(" ");
@@ -76,16 +95,16 @@ public class Parser {
 					found = true;
 				}
 			}
-			if(!found) {
+			if (!found) {
 				allThere = false;
 				break;
 			}
 		}
-		if(allThere) {
-			System.out.println(digitResult);
+		if (allThere) {
+			// System.out.println(digitResult);
 			return Integer.parseInt(digitResult);
 		}
-		
+
 		boolean isValidInput = true;
 		long result = 0;
 		long finalResult = 0;
@@ -192,13 +211,14 @@ public class Parser {
 
 				finalResult += result;
 				result = 0;
-				System.out.println(finalResult);	
+				// System.out.println(finalResult);
 				return finalResult;
 			}
 		}
-		return -1;
+		throw new Exception("Invalid number: " + input);
 	}
-	public static void main(String[] args){
+
+	public static void main(String[] args) throws Exception {
 		convertToInt("fifty five thousand three hundred and thirty three");
 	}
 }

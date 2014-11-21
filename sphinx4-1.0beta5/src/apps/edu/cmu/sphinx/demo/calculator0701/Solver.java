@@ -1,8 +1,23 @@
 package edu.cmu.sphinx.demo.calculator0701;
 
 public class Solver {
-	public static double calculate(String statement) {
-		Parser p = new Parser(statement);
+	private static double lastResult;
+	private static double lastSavedResult;
+	public static boolean hasSavedResult;
+	public static boolean hasResult;
+
+	public static String solve(String statement) {
+		try {
+			lastResult = calculate(statement);
+			hasResult = true;
+			return "" + lastResult;
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+	}
+	
+	public static double calculate(String statement) throws Exception {
+		Parser p = new Parser(statement.toLowerCase());
 		switch (p.getCommand()) {
 		case Parser.CUBE:
 			return Math.pow(p.getParsedArgs()[0], 3);
@@ -24,7 +39,13 @@ public class Solver {
 			return p.getParsedArgs()[0] * p.getParsedArgs()[1];
 		case Parser.DIVIDE:
 			return p.getParsedArgs()[0] / p.getParsedArgs()[1];
+		case Parser.SAVE:
+			lastSavedResult = lastResult;
+			hasSavedResult = true;
+			return lastResult;
+		case Parser.RESTORE:
+			return lastSavedResult;
 		}
-		return 0;
+		throw new Exception ("Operation not valid");
 	}
 }
