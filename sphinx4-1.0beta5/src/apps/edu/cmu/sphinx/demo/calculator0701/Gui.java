@@ -1,6 +1,24 @@
 package edu.cmu.sphinx.demo.calculator0701;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.Arrays;
+
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import edu.cmu.sphinx.frontend.util.Microphone;
+import edu.cmu.sphinx.recognizer.Recognizer;
+import edu.cmu.sphinx.result.Result;
+import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 
 
@@ -13,6 +31,7 @@ public class Gui extends JFrame{
 	String lastStoredResult = "", result = "";
 	boolean speaking = false;
 	private JTextField textField;
+	private static Recognizer recognizer;
 	public Gui() {
 		super("Caluclator");
 		getContentPane().setBackground(new Color(154, 205, 50));
@@ -124,7 +143,8 @@ public class Gui extends JFrame{
 			}
 		});
 		
-		JButton button_pi = new JButton("π");
+
+		JButton button_pi = new JButton("Pi");
 		button_pi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				appendInput("Pi");
@@ -194,7 +214,9 @@ public class Gui extends JFrame{
 		btnMr.setFont(new Font("Lucida Grande", Font.BOLD, 13));
 		btnMr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				appendInput( lastStoredResult);
+				appendInput("restore");
+				buttonEqual.setEnabled(valid());
+				//appendInput(lastStoredResult);
 			}
 		});
 		operations_panel.add(btnMr);
@@ -202,8 +224,10 @@ public class Gui extends JFrame{
 		btnMs = new JButton("MS");
 		btnMs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lastStoredResult = result;
-				valid();
+				appendInput("save");
+				//lastStoredResult = result;
+				buttonEqual.setEnabled(valid());
+				//valid();
 			}
 		});
 		btnMs.setFont(new Font("Lucida Grande", Font.BOLD, 13));
@@ -230,6 +254,9 @@ public class Gui extends JFrame{
 		buttonEqual = new JButton("=");
 		buttonEqual.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				textField.setText("" + Solver.solve(calcScreen.getText()));
+				calcScreen.setText("");
+				valid();
 			}
 		});
 		buttonEqual.setFont(new Font("Lucida Grande", Font.PLAIN, 32));
@@ -293,8 +320,8 @@ public class Gui extends JFrame{
 	public void enableOperations(boolean b){
 		for( int i = 0; operations_panel.getComponents().length > i ; i++)
 			operations_panel.getComponents()[i].setEnabled(b);
-		btnMs.setEnabled(result != "");
-		btnMr.setEnabled(lastStoredResult != "");
+		btnMs.setEnabled(Solver.hasResult);
+		btnMr.setEnabled(Solver.hasSavedResult);
 		buttonEqual.setEnabled(false);
 		this.repaint();
 	}
@@ -304,6 +331,8 @@ public class Gui extends JFrame{
 		this.repaint();
 	}
 	public boolean valid(){
+		enableOperations(true);
+		if(true)return true;
 		String[] numbers = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "pi", "e", "hundred", "thousand", "twenty", "thirty", "fourty", "fifty", "sixty", "seventy", "eighty", "ninety"};
 		String[] operations = {"plus", "minus", "multiply", "divide", "log", "power", "squared"};
 		String [] tmp = calcScreen.getText().split(" ");
@@ -328,7 +357,32 @@ public class Gui extends JFrame{
 	
 	public static void main(String[]args){
 		Gui g = new Gui();
-		
+		ConfigurationManager cm;
+
+        if (args.length > 0) {
+            cm = new ConfigurationManager(args[0]);
+        } else {
+            cm = new ConfigurationManager(Main.class.getResource("calculator.config.xml"));
+        }
+
+        recognizer = (Recognizer) cm.lookup("recognizer");
+        recognizer.allocate();
+
+        // start the microphone or exit if the programm if this is not possible
+        Microphone microphone = (Microphone) cm.lookup("microphone");
+        if (!microphone.startRecording()) {
+            System.out.println("Cannot start microphone.");
+            recognizer.deallocate();
+            System.exit(1);
+        }
+        Result result = recognizer.recognize();
+
+        if (result != null) {
+            String resultText = result.getBestFinalResultNoFiller();
+            System.out.println("You said: " + resultText + '\n');
+        } else {
+            System.out.println("I can't hear what you said.\n");
+        }
 	}
 }
 

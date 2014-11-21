@@ -6,7 +6,7 @@
 
 grammar calculator;
 
-public <expression> = <plus> | <minus> | <power> | <log> | <multiply> | <divide> | <square> | <cube>;
+public <expression> = <plus> | <minus> | <power> | <log> | <multiply> | <divide> | <square> | <cube> | save | restore;
 <square> = <term> squared;
 <cube> = <term> cubed;
 <log> = log <term> (base <term>);
