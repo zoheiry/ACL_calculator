@@ -15,7 +15,7 @@ public class Solver {
 			return e.getMessage();
 		}
 	}
-	
+
 	public static double calculate(String statement) throws Exception {
 		Parser p = new Parser(statement.toLowerCase());
 		switch (p.getCommand()) {
@@ -29,7 +29,8 @@ public class Solver {
 			if (p.getParsedArgs().length > 1) {
 				return Math.log(p.getParsedArgs()[0]);
 			} else {
-				return Math.log(p.getParsedArgs()[0])/Math.log(p.getParsedArgs()[1]);
+				return Math.log(p.getParsedArgs()[0])
+						/ Math.log(p.getParsedArgs()[1]);
 			}
 		case Parser.MINUS:
 			return p.getParsedArgs()[0] - p.getParsedArgs()[1];
@@ -40,12 +41,19 @@ public class Solver {
 		case Parser.DIVIDE:
 			return p.getParsedArgs()[0] / p.getParsedArgs()[1];
 		case Parser.SAVE:
-			lastSavedResult = lastResult;
-			hasSavedResult = true;
-			return lastResult;
+			if (hasResult) {
+				lastSavedResult = lastResult;
+				hasSavedResult = true;
+				return lastResult;
+			} else {
+				throw new Exception("You don't have anything to save yet");
+			}
 		case Parser.RESTORE:
-			return lastSavedResult;
+			if (hasSavedResult)
+				return lastSavedResult;
+			else
+				throw new Exception("You have not saved any result yet");
 		}
-		throw new Exception ("Operation not valid");
+		throw new Exception("Operation not valid");
 	}
 }
