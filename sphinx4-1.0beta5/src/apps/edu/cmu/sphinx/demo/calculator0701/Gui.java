@@ -306,6 +306,7 @@ public class Gui extends JFrame{
 		this.setSize(475, 290);
 		this.setVisible(true);
 		this.enableOperations(false);
+		this.getRootPane().setDefaultButton(buttonEqual);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
