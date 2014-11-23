@@ -143,6 +143,7 @@ public class Gui extends JFrame{
 			}
 		});
 		
+
 		JButton button_pi = new JButton("Pi");
 		button_pi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -284,7 +285,6 @@ public class Gui extends JFrame{
 				}else{
 					btnSpeak.setText("Speak");
 					speaking = false;
-					btnAc.setEnabled(true);
 					buttonEqual.setEnabled(valid());
 					calcScreen.setEditable(true);
 					enableNumbers(true);
@@ -334,8 +334,8 @@ public class Gui extends JFrame{
 	public boolean valid(){
 		enableOperations(true);
 		if(true)return true;
-		String[] numbers = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "pi", "e", "hundred", "thousand"};
-		String[] operations = {"plus", "minus", "multiply", "divide", "log", "power"};
+		String[] numbers = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "pi", "e", "hundred", "thousand", "twenty", "thirty", "fourty", "fifty", "sixty", "seventy", "eighty", "ninety"};
+		String[] operations = {"plus", "minus", "multiply", "divide", "log", "power", "squared"};
 		String [] tmp = calcScreen.getText().split(" ");
 		boolean has_op = false;
 		enableOperations(false);
@@ -386,5 +386,4 @@ public class Gui extends JFrame{
         }
 	}
 }
-
 
