@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import edu.cmu.sphinx.frontend.util.Microphone;
@@ -30,7 +31,7 @@ public class Gui extends JFrame{
 	JButton btnSpeak, buttonEqual, btnAc, btnMr, btnMs ;
 	String lastStoredResult = "", result = "";
 	boolean speaking = false;
-	private JTextField textField;
+	private JTextArea textField;
 	private static Recognizer recognizer;
 	ConfigurationManager cm;
 	Result rresult;
@@ -299,7 +300,13 @@ public class Gui extends JFrame{
 					microphone.stopRecording();
 					textField.setText("Stopped Recording");
 					rresult = recognizer.recognize();
-					calcScreen.setText(rresult.getBestFinalResultNoFiller());
+					if(rresult != null && !rresult.getBestFinalResultNoFiller().equals(""))
+						calcScreen.setText(rresult.getBestFinalResultNoFiller());
+					else {
+						calcScreen.setText("");
+						textField.setText("Sound not detected \n"
+								+ "correctly please try again");
+					}
 					recognizer.deallocate();
 					btnSpeak.setText("Speak");
 					speaking = false;
@@ -312,7 +319,8 @@ public class Gui extends JFrame{
 		btnSpeak.setBounds(367, 114, 104, 44);
 		getContentPane().add(btnSpeak);
 		
-		textField = new JTextField();
+		textField = new JTextArea();
+		textField.setColumns(22);
 		textField.setBounds(291, 6, 167, 96);
 		getContentPane().add(textField);
 		
@@ -381,7 +389,7 @@ public class Gui extends JFrame{
         if (args.length > 0) {
             g.cm = new ConfigurationManager(args[0]);
         } else {
-            g.cm = new ConfigurationManager(Main.class.getResource("calculator.config.xml"));
+            g.cm = new ConfigurationManager(Gui.class.getResource("calculator.config.xml"));
         }
 
 
