@@ -42,9 +42,10 @@ public class Parser {
 			args = statement.split("power");
 			this.command = POWER;
 		} else if (statement.contains("log")) {
-			args = statement.split("log");
-			if (args[0].contains("base")) {
-				args = args[0].split("base");
+			if (statement.contains("base")) {
+				args = statement.substring(3).split("base");
+			} else {
+				args = new String[] {statement.substring(3)};
 			}
 			this.command = LOG;
 		} else if (statement.contains("divide")) {
@@ -219,6 +220,7 @@ public class Parser {
 	}
 
 	public static void main(String[] args) throws Exception {
+		Solver.solve("log ten base five");
 		convertToInt("fifty five thousand three hundred and thirty three");
 	}
 }

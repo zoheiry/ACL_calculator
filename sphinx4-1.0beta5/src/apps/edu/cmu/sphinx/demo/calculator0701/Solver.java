@@ -26,8 +26,8 @@ public class Solver {
 		case Parser.POWER:
 			return Math.pow(p.getParsedArgs()[0], p.getParsedArgs()[1]);
 		case Parser.LOG:
-			if (p.getParsedArgs().length > 1) {
-				return Math.log(p.getParsedArgs()[0]);
+			if (p.getParsedArgs().length == 1) {
+				return Math.log(p.getParsedArgs()[0]) / Math.log(10);
 			} else {
 				return Math.log(p.getParsedArgs()[0])
 						/ Math.log(p.getParsedArgs()[1]);
