@@ -32,6 +32,9 @@ public class Gui extends JFrame{
 	boolean speaking = false;
 	private JTextField textField;
 	private static Recognizer recognizer;
+	ConfigurationManager cm;
+	Result rresult;
+	Microphone microphone;
 	public Gui() {
 		super("Caluclator");
 		getContentPane().setBackground(new Color(154, 205, 50));
@@ -282,7 +285,22 @@ public class Gui extends JFrame{
 					calcScreen.setEditable(false);
 					enableOperations(false);
 					enableNumbers(false);
+					recognizer = (Recognizer) cm.lookup("recognizer");
+			        microphone = (Microphone) cm.lookup("microphone");
+					recognizer.allocate();
+			        if (!microphone.startRecording()) {
+			        	textField.setText("Cannot start microphone.");
+			        }else{ 
+			        	textField.setText("Recording");
+			        }
+			        repaint();
+			        
 				}else{
+					microphone.stopRecording();
+					textField.setText("Stopped Recording");
+					rresult = recognizer.recognize();
+					calcScreen.setText(rresult.getBestFinalResultNoFiller());
+					recognizer.deallocate();
 					btnSpeak.setText("Speak");
 					speaking = false;
 					buttonEqual.setEnabled(valid());
@@ -358,32 +376,15 @@ public class Gui extends JFrame{
 	
 	public static void main(String[]args){
 		Gui g = new Gui();
-		ConfigurationManager cm;
+		System.out.println("GUI CLASS DONE");
 
         if (args.length > 0) {
-            cm = new ConfigurationManager(args[0]);
+            g.cm = new ConfigurationManager(args[0]);
         } else {
-            cm = new ConfigurationManager(Main.class.getResource("calculator.config.xml"));
+            g.cm = new ConfigurationManager(Main.class.getResource("calculator.config.xml"));
         }
 
-        recognizer = (Recognizer) cm.lookup("recognizer");
-        recognizer.allocate();
 
-        // start the microphone or exit if the programm if this is not possible
-        Microphone microphone = (Microphone) cm.lookup("microphone");
-        if (!microphone.startRecording()) {
-            System.out.println("Cannot start microphone.");
-            recognizer.deallocate();
-            System.exit(1);
-        }
-        Result result = recognizer.recognize();
-
-        if (result != null) {
-            String resultText = result.getBestFinalResultNoFiller();
-            System.out.println("You said: " + resultText + '\n');
-        } else {
-            System.out.println("I can't hear what you said.\n");
-        }
 	}
 }
 
