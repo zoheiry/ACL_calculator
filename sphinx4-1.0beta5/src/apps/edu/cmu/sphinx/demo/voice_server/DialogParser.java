@@ -136,14 +136,16 @@ public class DialogParser {
 	private static boolean statisfiesCondition(String condition) {
 		// get a condition statement in the form of "variable" or "!variable" and
 		// check whether the value of the variable is true or false accordingly
-		boolean b = variables.get(condition.replaceFirst("!", "")).equalsIgnoreCase("true") ? true : false;
+		boolean b = variables.get(condition.replaceFirst("[!]", "")).equalsIgnoreCase("true") ? true : false;
 		return condition.startsWith("!") ? !b : b;
 	}
 
 	private static void setVariable(String variable, String tag_text) {
 		// This method should parse the tag text given and set the correct
 		// value in the hashmap.
-
+		String parsed_tag_text = tag_text.replaceFirst("([$][=][']|[$][=])", "");
+		parsed_tag_text = parsed_tag_text.endsWith("';") ? parsed_tag_text.substring(0, parsed_tag_text.length() -2) : parsed_tag_text.substring(0, parsed_tag_text.length() - 1);
+		variables.put(variable, parsed_tag_text);
 	}
 
 	public static void main(String[] args) throws Exception {
