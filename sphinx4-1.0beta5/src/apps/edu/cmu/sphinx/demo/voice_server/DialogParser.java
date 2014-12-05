@@ -136,7 +136,8 @@ public class DialogParser {
 	private static boolean statisfiesCondition(String condition) {
 		// get a condition statement in the form of "variable" or "!variable" and
 		// check whether the value of the variable is true or false accordingly
-		return false;
+		boolean b = variables.get(condition.replaceFirst("!", "")).equalsIgnoreCase("true") ? true : false;
+		return condition.startsWith("!") ? !b : b;
 	}
 
 	private static void setVariable(String variable, String tag_text) {
