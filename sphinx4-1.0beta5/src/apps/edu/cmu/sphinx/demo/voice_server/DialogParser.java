@@ -34,7 +34,10 @@ class Input {
 		// given a list of choices return the index of the string that matches
 		// the input
 		// if not found return -1
-		return 0;
+		for(int i = 0; i < choices.size(); i++)
+			if(choices.get(i).equalsIgnoreCase(input))
+				return i;
+		return -1;
 	}
 }
 
