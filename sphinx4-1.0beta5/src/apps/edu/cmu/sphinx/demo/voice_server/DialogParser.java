@@ -23,13 +23,22 @@ import org.xml.sax.InputSource;
 
 class Voice {
 	public static void say(String s) {
-
+		System.out.println(s);
 	}
 }
 
 class Input {
+	static int i=0;
 	public static String get() {
-		return "";
+		String[] a = {
+			"big",
+			"yes",
+			"cheese",
+			"yes",
+			"thin"
+		};
+		System.out.println(a[i]);
+		return a[i++];
 	}
 
 	public static int pickFromChoices(ArrayList<String> choices, String input) {
@@ -37,7 +46,7 @@ class Input {
 		// the input
 		// if not found return -1
 		for(int i = 0; i < choices.size(); i++)
-			if(choices.get(i).equalsIgnoreCase(input))
+			if(choices.get(i).trim().equalsIgnoreCase(input.trim()))
 				return i;
 		return -1;
 	}
@@ -45,7 +54,7 @@ class Input {
 
 public class DialogParser {
 
-	static HashMap<String, String> variables;
+	static HashMap<String, String> variables = new HashMap<>();
 
 	public static void parse() throws Exception {
 		VoiceXmlDocument document = new VoiceXmlDocument(new InputSource(
@@ -79,8 +88,8 @@ public class DialogParser {
 						Value expression = (Value) var;
 						Text replacedText = new Text(var.getNode(),
 								xmlNodeFactory);
-						// replacedText.setTextContent(variables.get(expression
-						// .getExpr()));
+						replacedText.setTextContent(variables.get(expression
+						  .getExpr()));
 						n.replaceChild(var, replacedText);
 					}
 				}
@@ -112,7 +121,7 @@ public class DialogParser {
 						setVariable(varname, taglist.get(index));
 						break;
 					}
-					Voice.say("I couldnt get what you said.");
+					Voice.say("I couldn't get what you said.");
 				}
 			} else if (n.getNodeName().equals("filled")) {
 				String s = n.getTextContent().replaceAll("\\s", "");
@@ -149,7 +158,7 @@ public class DialogParser {
 	private static void setVariable(String variable, String tag_text) {
 		// This method should parse the tag text given and set the correct
 		// value in the hashmap.
-		String parsed_tag_text = tag_text.replaceFirst("([$][=][']|[$][=])", "");
+		String parsed_tag_text = tag_text.replaceFirst("([$][=][']|[$][=])", "").trim();
 		parsed_tag_text = parsed_tag_text.endsWith("';") ? parsed_tag_text.substring(0, parsed_tag_text.length() -2) : parsed_tag_text.substring(0, parsed_tag_text.length() - 1);
 		variables.put(variable, parsed_tag_text);
 	}
