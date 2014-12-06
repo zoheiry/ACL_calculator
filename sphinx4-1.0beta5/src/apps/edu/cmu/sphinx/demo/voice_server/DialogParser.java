@@ -4,11 +4,13 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.jvoicexml.xml.Text;
+import org.jvoicexml.xml.TokenList;
 import org.jvoicexml.xml.XmlNode;
 import org.jvoicexml.xml.XmlNodeFactory;
 import org.jvoicexml.xml.srgs.Grammar;
 import org.jvoicexml.xml.srgs.Item;
 import org.jvoicexml.xml.srgs.Rule;
+import org.jvoicexml.xml.vxml.Clear;
 import org.jvoicexml.xml.vxml.Field;
 import org.jvoicexml.xml.vxml.Form;
 import org.jvoicexml.xml.vxml.If;
@@ -51,24 +53,23 @@ public class DialogParser {
 		NodeList b = form.getChildNodes();
 		for (int i = 0; i < b.getLength(); i++) {
 			Node n = b.item(i);
-			s = n.getNodeName();
 			if (n.getNodeName().equals("block")) {
 				Voice.say(n.getTextContent());
 			} else if (n.getNodeName().equals("field")) {
-				handleField((Field) n, document.getXmlNodefactory());
+				if(!handleField((Field) n, document.getXmlNodefactory()))
+					i -= 2;
 			}
 
 		}
 
 	}
 
-	private static void handleField(Field field,
+	private static boolean handleField(Field field,
 			XmlNodeFactory<?> xmlNodeFactory) {
 		String varname = field.getName();
-		Collection<XmlNode> children = field.getChildren();
 		String input = "";
 		String prompt = "";
-		for (XmlNode n : children) {
+		for (XmlNode n : field.getChildren()) {
 			if (n.getNodeName().equals("prompt")) {
 				for (XmlNode var : n.getChildren()) {
 					if (var.getNodeName().equals("value")) {
@@ -120,20 +121,25 @@ public class DialogParser {
 							If ifNode = (If) node;
 							String condition = ifNode.getCond();
 							if (statisfiesCondition(condition)) {
-
+								Clear c = (Clear) ifNode.getChildNodes().item(0);
+								TokenList tokenList = c.getNameListObject();
+								for (String variable : tokenList) {
+									variables.remove(variable);
+								}
+								return false;
 							}
 						}
 					}
 				}
 			}
 		}
-
+		return true;
 	}
 
 	private static boolean statisfiesCondition(String condition) {
 		// get a condition statement in the form of "variable" or "!variable" and
 		// check whether the value of the variable is true or false accordingly
-		return false;
+		return true;
 	}
 
 	private static void setVariable(String variable, String tag_text) {
