@@ -148,6 +148,19 @@ public class DialogParser {
 		variables.put(variable, parsed_tag_text);
 	}
 
+	public static int price(String size, String toppings, String thickness){
+		int value = 20;
+	    if (size.equalsIgnoreCase("big")) value += 5;
+	    if (size.equalsIgnoreCase("xlarge")) value += 10;
+	    if (size.equalsIgnoreCase("family")) value += 15;
+	    if (toppings.equalsIgnoreCase("cheese")) value += 1;
+	    if (toppings.equalsIgnoreCase("chicken")) value += 1;
+	    if (toppings.equalsIgnoreCase("mushrooms")) value += 2;
+	    if (thickness.equalsIgnoreCase("thin")) value += 2;
+	    if (thickness.equalsIgnoreCase("pan")) value += 5;
+		return value; 
+	}
+
 	public static void main(String[] args) throws Exception {
 		parse();
 	}
