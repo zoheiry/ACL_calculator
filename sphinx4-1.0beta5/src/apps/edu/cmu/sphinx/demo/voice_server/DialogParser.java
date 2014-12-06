@@ -4,11 +4,13 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.jvoicexml.xml.Text;
+import org.jvoicexml.xml.TokenList;
 import org.jvoicexml.xml.XmlNode;
 import org.jvoicexml.xml.XmlNodeFactory;
 import org.jvoicexml.xml.srgs.Grammar;
 import org.jvoicexml.xml.srgs.Item;
 import org.jvoicexml.xml.srgs.Rule;
+import org.jvoicexml.xml.vxml.Clear;
 import org.jvoicexml.xml.vxml.Field;
 import org.jvoicexml.xml.vxml.Form;
 import org.jvoicexml.xml.vxml.If;
@@ -21,13 +23,22 @@ import org.xml.sax.InputSource;
 
 class Voice {
 	public static void say(String s) {
-
+		System.out.println(s);
 	}
 }
 
 class Input {
+	static int i=0;
 	public static String get() {
-		return "";
+		String[] a = {
+			"big",
+			"yes",
+			"cheese",
+			"yes",
+			"thin"
+		};
+		System.out.println(a[i]);
+		return a[i++];
 	}
 
 	public static int pickFromChoices(ArrayList<String> choices, String input) {
@@ -35,7 +46,7 @@ class Input {
 		// the input
 		// if not found return -1
 		for(int i = 0; i < choices.size(); i++)
-			if(choices.get(i).equalsIgnoreCase(input))
+			if(choices.get(i).trim().equalsIgnoreCase(input.trim()))
 				return i;
 		return -1;
 	}
@@ -43,7 +54,7 @@ class Input {
 
 public class DialogParser {
 
-	static HashMap<String, String> variables;
+	static HashMap<String, String> variables = new HashMap<>();
 
 	public static void parse() throws Exception {
 		VoiceXmlDocument document = new VoiceXmlDocument(new InputSource(
@@ -54,32 +65,31 @@ public class DialogParser {
 		NodeList b = form.getChildNodes();
 		for (int i = 0; i < b.getLength(); i++) {
 			Node n = b.item(i);
-			s = n.getNodeName();
 			if (n.getNodeName().equals("block")) {
 				Voice.say(n.getTextContent());
 			} else if (n.getNodeName().equals("field")) {
-				handleField((Field) n, document.getXmlNodefactory());
+				if(!handleField((Field) n, document.getXmlNodefactory()))
+					i -= 2;
 			}
 
 		}
 
 	}
 
-	private static void handleField(Field field,
+	private static boolean handleField(Field field,
 			XmlNodeFactory<?> xmlNodeFactory) {
 		String varname = field.getName();
-		Collection<XmlNode> children = field.getChildren();
 		String input = "";
 		String prompt = "";
-		for (XmlNode n : children) {
+		for (XmlNode n : field.getChildren()) {
 			if (n.getNodeName().equals("prompt")) {
 				for (XmlNode var : n.getChildren()) {
 					if (var.getNodeName().equals("value")) {
 						Value expression = (Value) var;
 						Text replacedText = new Text(var.getNode(),
 								xmlNodeFactory);
-						// replacedText.setTextContent(variables.get(expression
-						// .getExpr()));
+						replacedText.setTextContent(variables.get(expression
+						  .getExpr()));
 						n.replaceChild(var, replacedText);
 					}
 				}
@@ -111,7 +121,7 @@ public class DialogParser {
 						setVariable(varname, taglist.get(index));
 						break;
 					}
-					Voice.say("I couldnt get what you said.");
+					Voice.say("I couldn't get what you said.");
 				}
 			} else if (n.getNodeName().equals("filled")) {
 				String s = n.getTextContent().replaceAll("\\s", "");
@@ -123,14 +133,19 @@ public class DialogParser {
 							If ifNode = (If) node;
 							String condition = ifNode.getCond();
 							if (statisfiesCondition(condition)) {
-
+								Clear c = (Clear) ifNode.getChildNodes().item(0);
+								TokenList tokenList = c.getNameListObject();
+								for (String variable : tokenList) {
+									variables.remove(variable);
+								}
+								return false;
 							}
 						}
 					}
 				}
 			}
 		}
-
+		return true;
 	}
 
 	private static boolean statisfiesCondition(String condition) {
@@ -143,7 +158,7 @@ public class DialogParser {
 	private static void setVariable(String variable, String tag_text) {
 		// This method should parse the tag text given and set the correct
 		// value in the hashmap.
-		String parsed_tag_text = tag_text.replaceFirst("([$][=][']|[$][=])", "");
+		String parsed_tag_text = tag_text.replaceFirst("([$][=][']|[$][=])", "").trim();
 		parsed_tag_text = parsed_tag_text.endsWith("';") ? parsed_tag_text.substring(0, parsed_tag_text.length() -2) : parsed_tag_text.substring(0, parsed_tag_text.length() - 1);
 		variables.put(variable, parsed_tag_text);
 	}
